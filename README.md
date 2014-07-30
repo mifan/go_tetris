@@ -1,8 +1,13 @@
 Online Tetris Battle Written in Golang
 ----
 
-TODO: add more test
+TODO: 
+
+* more test
+
+* better comment
+
+* debug
 
 
 ----
-License: MIT
