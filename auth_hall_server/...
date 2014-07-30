@@ -1,0 +1,27 @@
+
+{
+	"log"			: "/var/log/authentication_server.log",
+	"publicServerRpcPort"	: "9098",
+	"privServerRpcPort"	: "9099",
+	"gameServerRpcPort"	: "9077",
+	"gameServerSocketPort"	: "7826",
+	"dbUser"   		: "cointetris",
+	"dbPass"   		: "Six*7s41$%",
+	"dbName"   		: "cointetris",
+	"dbProtocol" 		: "unix",
+	"dbSockAddress"  	: "/var/lib/mysql/mysql.sock",
+	"btcUser" 		: "user",
+	"btcPass"		: "pass",
+	"btcServer"		: "127.0.0.1:8332",
+	"emailIdentity"		: "Cointetris",
+	"emailUsername"		: "admin@cointetris.com",
+	"emailPassword"		: "woaimym88",
+	"emailHost"		: "smtp.exmail.qq.com",
+	"emailPort"		: 25,
+	"emailFrom"		: "admin@cointetris.com",
+	"cookieEncryptKey"	: "97渣渣撸狗",
+	"tokenEncryptKey"	: "米嘛渣人才",
+	"scryptSalt"		: "百里挑一的人渣",
+	"privKey"		: "渣渣吃辣条",
+	"domain"		: ".cointetris.com"
+}

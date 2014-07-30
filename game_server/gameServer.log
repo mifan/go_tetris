@@ -1,0 +1,22 @@
+2014/07/28 12:51:27 [logs.go:18] [I] initialize logger...
+2014/07/28 12:51:27 [serverStatus.go:25] [I] activating the server...
+2014/07/28 12:51:27 [socketServer.go:30] [I] successfully initialization, socket server accepting connection...
+2014/07/28 12:51:27 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:51:32 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:51:37 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:19 [logs.go:18] [I] initialize logger...
+2014/07/28 12:52:19 [serverStatus.go:25] [I] activating the server...
+2014/07/28 12:52:19 [socketServer.go:30] [I] successfully initialization, socket server accepting connection...
+2014/07/28 12:52:19 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:24 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:29 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:34 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:39 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:44 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:49 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:54 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:52:59 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:53:04 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:53:09 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:53:14 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
+2014/07/28 12:53:19 [serverStatus.go:33] [I] trying to activate the server but failed: Post http://127.0.0.1:9099/: dial tcp 127.0.0.1:9099: connection refused
