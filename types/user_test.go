@@ -9,21 +9,20 @@ func Test_Users(t *testing.T) {
 
 	us.SetNextId(1)
 
-	us.Add(NewUser(us.GetNextId(), "pureveg@163.com", "password", "cointetris", "Ltcunixxx"))
+	us.Add(NewUser(us.GetNextId(), "hello@world.com", "password", "cointetris", "Ltcunixxx"))
 	us.IncrNextId()
 
-	if !us.IsEmailExist("pureveg@163.com") {
+	if !us.IsEmailExist("hello@world.com") {
 		t.Error("error, why not exist in ", us.emails)
 	}
 
 	us.Update(1, NewUpdateInt(UF_Balance, 1024))
 
 	t.Log("here")
-	t.Log(us.GetByEmail("pureveg@163.com"))
+	t.Log(us.GetByEmail("hello@world.com"))
 	t.Log("there")
-	// us.Add(NewUser(us.GetNextId(), 1, 0, 0, 0, 0, "hello@qq.com", "pureveg", "Ltsss"))
 
-	sql, args = us.GetByEmail("pureveg@163.com").SqlGeneratorUpdate()
+	sql, args = us.GetByEmail("hello@world.com").SqlGeneratorUpdate()
 	t.Log(sql)
 	t.Log(args)
 }
