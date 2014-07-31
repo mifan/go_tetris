@@ -48,6 +48,7 @@ func initConf() {
 	emailUser = conf.String("emailUsername")
 	emailPass = conf.String("emailPassword")
 	emailHost = conf.String("emailHost")
+	emailFrom = conf.String("emailFrom")
 	cookieEncryptKey = conf.String("cookieEncryptKey")
 	tokenEncryptKey = conf.String("tokenEncryptKey")
 	scryptSalt = conf.String("scryptSalt")
