@@ -12,7 +12,7 @@ forLoop:
 				continue forLoop
 			}
 		case int, int32, int64, uint, uint32, uint64:
-			if fmt.Sprintf("%v", v) == "0" {
+			if fmt.Sprintf("%v", v) != "0" {
 				continue forLoop
 			}
 		}
