@@ -157,6 +157,7 @@ func (privStub) Quit(tid, uid int, isTournament bool) {
 	} else {
 		normalHall.GetTableById(tid).Quit(uid)
 	}
+	users.SetFree(uid)
 }
 
 var errTournamentDefaultReady = fmt.Errorf("tournament default is ready and can not set to not ready, what is wrong?")
