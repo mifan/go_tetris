@@ -29,10 +29,12 @@ func notify() {
 	}
 	// waiting for all game server unregister
 	for clients.NumOfGS() > 0 {
+		time.Sleep(time.Second)
 	}
 	allGSReleased = true
 	// waiting for all functions in function queue to be done
 	for !progCanExit {
+		time.Sleep(time.Second)
 	}
 
 	log.Info("the auth server is gracefully exit...")
