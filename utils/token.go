@@ -9,9 +9,7 @@ import (
 	"github.com/xxtea/xxtea-go/xxtea"
 )
 
-// default key
-// better change it to your own key
-var tokenKey = []byte("妖魔鬼怪x")
+var tokenKey []byte
 
 func SetTokenKey(key []byte) {
 	tokenKey = key
