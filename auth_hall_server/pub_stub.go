@@ -102,7 +102,6 @@ func (pubStub) ForgetPassword(newPassword, authenCode string, ctx interface{}) e
 	} else if code != authenCode {
 		return errForgetPassIncorrectCode
 	}
-	session.DeleteKey(sessKeyForgetPass, ctx)
 
 	if !passReg.MatchString(newPassword) {
 		return errIncorrectPasswordFormat
@@ -119,6 +118,8 @@ func (pubStub) ForgetPassword(newPassword, authenCode string, ctx interface{}) e
 	if err := u.Update(types.NewUpdateString(types.UF_Password, utils.Encrypt(newPassword))); err != nil {
 		return err
 	}
+	// delete session
+	session.DeleteKey(sessKeyForgetPass, ctx)
 	pushFunc(func() { insertOrUpdateUser(u) })
 	return nil
 }

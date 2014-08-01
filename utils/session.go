@@ -66,7 +66,7 @@ func (ss *sessionStore) generateSessionId(ctx interface{}) string {
 // get session id from context
 func (ss *sessionStore) getSessionId(ctx interface{}) string {
 	sess, err := GetCookie(cookieSessId, ctx)
-	fmt.Printf("session id is %v, err is %v\n", sess, err)
+	fmt.Printf("get session id %v, err is %v\n", sess, err)
 	if err != nil {
 		return ""
 	}
@@ -113,6 +113,7 @@ func (ss *sessionStore) SetSession(key string, val interface{}, ctx interface{})
 	sessId := ss.getSessionId(ctx)
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
+	fmt.Printf("set session key %s, value %v\n", key, val)
 	ss.sess[sessId].set(key, val)
 }
 
@@ -121,6 +122,7 @@ func (ss *sessionStore) DeleteKey(key string, ctx interface{}) {
 	sessId := ss.getSessionId(ctx)
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
+	fmt.Printf("delete session key %s\n", key)
 	ss.sess[sessId].del(key)
 }
 
