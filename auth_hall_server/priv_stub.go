@@ -14,6 +14,11 @@ func (privStub) Register(maxConn int, ctx interface{}) {
 	clients.NewGameServer(utils.GetIp(ctx), maxConn)
 }
 
+// deactivate a game server
+func (privStub) Deactivate(ctx interface{}) {
+	clients.Deactivate(utils.GetIp(ctx))
+}
+
 // unregister a game server
 func (privStub) Unregister(ctx interface{}) {
 	clients.Delete(utils.GetIp(ctx))

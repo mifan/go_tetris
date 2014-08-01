@@ -42,6 +42,8 @@ type GameServersRpc struct {
 	gssMu              sync.RWMutex
 	gameServerNumConns map[string]*numConn
 	gsncMu             sync.RWMutex
+	gameServerStatus   map[string]bool
+	gsstatMu           sync.RWMutex
 	port               string
 }
 
@@ -50,6 +52,7 @@ func NewGameServerRpc(port string) *GameServersRpc {
 		gameServerClient:   make(map[string]hprose.Client),
 		gameServerStubs:    make(map[string]*gameServerStub),
 		gameServerNumConns: make(map[string]*numConn),
+		gameServerStatus:   make(map[string]bool),
 		port:               port,
 	}
 }
@@ -96,10 +99,16 @@ func (gsr *GameServersRpc) NewGameServer(ip string, maxConn int) {
 		defer gsr.gsncMu.Unlock()
 		gsr.gameServerNumConns[ip] = newNumConn(maxConn)
 	}
+	addStat := func() {
+		gsr.gsstatMu.Lock()
+		defer gsr.gsstatMu.Unlock()
+		gsr.gameServerStatus[ip] = true
+	}
 
 	addStub()
 	addClient()
 	addNc()
+	addStat()
 }
 
 // delete a game server
@@ -119,11 +128,23 @@ func (gsr *GameServersRpc) Delete(ip string) {
 		defer gsr.gsncMu.Unlock()
 		delete(gsr.gameServerNumConns, ip)
 	}
+	delStat := func() {
+		gsr.gsstatMu.Lock()
+		defer gsr.gsstatMu.Unlock()
+		delete(gsr.gameServerStatus, ip)
+	}
 
 	delStub()
 	delClient()
 	delNc()
+	delStat()
+}
 
+// deactivate a game server
+func (gsr *GameServersRpc) Deactivate(ip string) {
+	gsr.gsstatMu.Lock()
+	defer gsr.gsstatMu.Unlock()
+	gsr.gameServerStatus[ip] = false
 }
 
 // check if the ip exist before invoke this
@@ -146,6 +167,14 @@ func (gsr *GameServersRpc) BestServer() (ip string) {
 	defer gsr.gsncMu.RUnlock()
 	var usage float64 = 2
 	for i, v := range gsr.gameServerNumConns {
+		// check if the server is deactivated
+		if !func() bool {
+			gsr.gsstatMu.RLock()
+			defer gsr.gsstatMu.RUnlock()
+			return gsr.gameServerStatus[i]
+		}() {
+			continue
+		}
 		if l := v.Load(); l < usage {
 			usage = l
 			ip = i
