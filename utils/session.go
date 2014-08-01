@@ -175,20 +175,22 @@ func newSession() *session {
 func (s *session) set(key string, val interface{}) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	fmt.Printf("set key %s with key length %d", key, len(key))
+	fmt.Printf("set key %s with key length %d\n", key, len(key))
 	s.vals[key] = val
 	s.updated = time.Now().Unix()
+	fmt.Printf("currently this session is %v\n", s.vals)
 }
 
 func (s *session) get(key string) interface{} {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	fmt.Printf("get key %s with key length %d", key, len(key))
+	fmt.Printf("get key %s with key length %d\n", key, len(key))
 	return s.vals[key]
 }
 
 func (s *session) del(key string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	fmt.Printf("del key %s\n", key)
 	delete(s.vals, key)
 }
