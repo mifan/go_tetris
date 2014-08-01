@@ -114,7 +114,7 @@ func (ss *sessionStore) SetSession(key string, val interface{}, ctx interface{})
 	sessId := ss.getSessionId(ctx)
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
-	fmt.Printf("set session key %s, value %v\n", key, val)
+	fmt.Printf("set session for sessId %s: key %s, value %v\n", sessId, key, val)
 	ss.sess[sessId].set(key, val)
 }
 
@@ -175,6 +175,7 @@ func newSession() *session {
 func (s *session) set(key string, val interface{}) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	fmt.Printf("set key %s with key length %d", key, len(key))
 	s.vals[key] = val
 	s.updated = time.Now().Unix()
 }
@@ -182,6 +183,7 @@ func (s *session) set(key string, val interface{}) {
 func (s *session) get(key string) interface{} {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+	fmt.Printf("get key %s with key length %d", key, len(key))
 	return s.vals[key]
 }
 
