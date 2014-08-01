@@ -95,3 +95,10 @@ func (t *Timer) Reset() {
 func (t *Timer) Wait() {
 	<-t.tick
 }
+
+// stop
+func (t *Timer) Stop() {
+	t.Lock()
+	defer t.Unlock()
+	t.ticker.Stop()
+}

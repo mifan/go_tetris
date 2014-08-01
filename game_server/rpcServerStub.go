@@ -22,6 +22,7 @@ func countDown(table *types.Table) {
 		sendAll(descStart, i, table.GetAllConns()...)
 		t.Wait()
 	}
+	t.Stop()
 	sendAll(descStart, 0, table.GetAllConns()...)
 }
 

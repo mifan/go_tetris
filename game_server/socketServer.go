@@ -87,7 +87,7 @@ func serveTcpConn(conn *net.TCPConn) {
 	}
 	if data.Cmd != cmdAuth {
 		log.Debug("the first command is not auth, the data is %v", data)
-		send(conn, descError, "the first command should be auth")
+		send(conn, descError, "the first command should be auth, are you hacker?")
 		closeConn(conn)
 		return
 	}
@@ -115,6 +115,7 @@ func serveTcpConn(conn *net.TCPConn) {
 		if !tables.IsTableExist(tid) {
 			tables.NewTable(tid, "", "", 0)
 		}
+		// the err should always be nil actually
 		if err := tables.JoinTable(tid, u, false); err != nil {
 			log.Debug("can not join the table, game server error: %v", err)
 			send(conn, descError, fmt.Sprintf("无法加入桌子, 错误: %v", err))
@@ -247,7 +248,7 @@ func quit(tid, uid int, nickname string, is1p, isTournament bool) {
 		}
 	}
 	if err := authServerStub.Quit(tid, uid, isTournament); err != nil {
-		log.Warn("can not quit user %s from table %d: %v", nickname, tid, err)
+		log.Warn("hprose error, can not quit user %s from table %d: %v", nickname, tid, err)
 	}
 }
 
