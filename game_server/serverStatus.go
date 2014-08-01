@@ -28,6 +28,10 @@ func activateServer() {
 
 // deactivate the server
 func deactivateServer() {
+	if !isServerActive() {
+		log.Info("the server is not active, so no need to deactivate it...")
+		return
+	}
 	// set server status to inactive
 	// wait for all games done
 	log.Info("deactivating the server...")
