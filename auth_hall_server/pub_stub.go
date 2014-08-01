@@ -131,7 +131,6 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 	} else if code != authenCode {
 		return errRegisterIncorrectCode
 	}
-	session.DeleteKey(sessKeyRegister, ctx)
 
 	// check input
 	if !emailReg.MatchString(email) {
@@ -159,6 +158,8 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 	if password == "" {
 		return errEncryptPassword
 	}
+	// delete the authen code
+	session.DeleteKey(sessKeyRegister, ctx)
 	// add user in cache
 	u := types.NewUser(users.GetNextId(), email, password, nickname, addr)
 	users.Add(u)
