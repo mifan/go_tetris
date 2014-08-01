@@ -7,6 +7,7 @@ import (
 
 type authServer struct {
 	Register            func(maxConn int) error
+	Deactivate          func() error
 	Unregister          func() error
 	Join                func(tid, uid int, isOb bool) error
 	ObTournament        func(tid, uid int) error

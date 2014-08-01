@@ -35,6 +35,9 @@ func deactivateServer() {
 	// set server status to inactive
 	// wait for all games done
 	log.Info("deactivating the server...")
+	if err := authServerStub.Deactivate(); err != nil {
+		log.Warn("can not inform auth server that the game server is deactivating: %v", err)
+	}
 	serverStatus = statusInactive
 	for {
 		l := tables.Length()

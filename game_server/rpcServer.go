@@ -16,6 +16,10 @@ type stub struct{}
 type se struct{}
 
 func (se) OnBeforeInvoke(funcName string, params []reflect.Value, isSimple bool, ctx interface{}) {
+	if !isServerActive() {
+		panic("game server is closing, do not accept any request...")
+	}
+
 	log.Info(utils.HproseLog(funcName, params, ctx))
 
 	if ip := utils.GetIp(ctx); ip != authServerIp {
