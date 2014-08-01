@@ -20,7 +20,7 @@ type sessionStore struct {
 func NewSessionStore() *sessionStore {
 	ss := &sessionStore{
 		sess:           make(map[string]*session),
-		expireInMinute: 30,
+		expireInMinute: 120,
 	}
 	return ss.start()
 }
