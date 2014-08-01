@@ -1,3 +1,6 @@
+/*
+	rpc server stubs
+*/
 package main
 
 import (

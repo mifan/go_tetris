@@ -1,3 +1,6 @@
+/*
+	rpc server for auth server to control it
+*/
 package main
 
 import (

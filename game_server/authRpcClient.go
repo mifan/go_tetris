@@ -1,3 +1,6 @@
+/*
+	rpc client connect to private rpc server
+*/
 package main
 
 import (

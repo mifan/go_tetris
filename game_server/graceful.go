@@ -1,3 +1,6 @@
+/*
+	gracefully exit the program when kill or C-c command is executed
+*/
 package main
 
 import (

@@ -1,3 +1,6 @@
+/*
+	socket server
+*/
 package main
 
 import (
@@ -34,7 +37,7 @@ func initSocketServer() {
 				continue
 			}
 			if !isServerActive() {
-				log.Info("the server is currently inactive, do not accept new connections...")
+				log.Info("the game server is closing, do not accept new connections...")
 				closeConn(conn)
 				continue
 			}
