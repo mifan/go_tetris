@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"reflect"
 
@@ -19,21 +18,13 @@ type (
 )
 
 func (pubSe) OnBeforeInvoke(fName string, params []reflect.Value, isSimple bool, ctx interface{}) {
+	log.Info(utils.HproseLog(fName, params, ctx))
 	if !pubServerEnable {
 		panic("we are closing the server, not accept request at the moment")
 	}
 
 	log.Info("create session for ip: %s", utils.GetIp(ctx))
 	session.CreateSession(ctx)
-
-	str := "invoker from " + utils.GetIp(ctx) + "\n"
-	str += "invokes the function " + fName + "\n"
-	str += "parameters: "
-	for _, v := range params {
-		str += fmt.Sprintf("%v  ", v.Interface())
-	}
-	str += "\n"
-	log.Info(str)
 }
 
 func (pubSe) OnAfterInvoke(string, []reflect.Value, bool, []reflect.Value, interface{}) {}

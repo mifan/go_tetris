@@ -21,7 +21,7 @@ type (
 )
 
 func (privSe) OnBeforeInvoke(funcN string, params []reflect.Value, isSimple bool, ctx interface{}) {
-	log.Info("invoker from ip %v, invoke function %v, params %v", utils.GetIp(ctx), funcN, params)
+	log.Info(utils.HproseLog(funcN, params, ctx))
 	if funcN != "Register" && !clients.IsServerExist(utils.GetIp(ctx)) {
 		panic("game server should first register, otherwise it is not allowed to invoke functions in auth server")
 	}

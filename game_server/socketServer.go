@@ -1,6 +1,5 @@
 package main
 
-// TODO: a lot to do
 import (
 	"fmt"
 	"net"
