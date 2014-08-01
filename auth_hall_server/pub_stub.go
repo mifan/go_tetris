@@ -19,8 +19,9 @@ const (
 	ratioEnergy2mBTC  = 10
 
 	// error const
-	errUserNotExist  = "用户 %v 已经被占用"
-	errTableNotExist = "桌子 %v 不存在, 请加入别的桌子"
+	errUserNotExist   = "用户 %v 已经被占用"
+	errTableNotExist  = "桌子 %v 不存在, 请加入别的桌子"
+	errUnmatchedEmail = "验证码发到邮箱 %s, 注册邮箱也必须是这个! 请不要这样攻击我们的服务!"
 )
 
 var (
@@ -64,6 +65,7 @@ var (
 func (pubStub) SendMailRegister(to string, ctx interface{}) error {
 	authenCode := utils.RandString(8)
 	session.SetSession(sessKeyRegister, authenCode, ctx)
+	session.SetSession(sessKeyEmail, to, ctx)
 	text := "请输入验证码: " + authenCode
 	subject := "注册验证"
 	pushFunc(func() {
@@ -131,6 +133,12 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 		return errRegisterGetCodeFirst
 	} else if code != authenCode {
 		return errRegisterIncorrectCode
+	}
+	// check email
+	if tmpEmail, ok := session.GetSession(sessKeyEmail, ctx).(string); !ok {
+		return errRegisterGetCodeFirst
+	} else if email != tmpEmail {
+		return fmt.Errorf(errUnmatchedEmail, tmpEmail)
 	}
 
 	// check input

@@ -23,10 +23,7 @@ func (pubSe) OnBeforeInvoke(fName string, params []reflect.Value, isSimple bool,
 		panic("we are closing the server, not accept request at the moment")
 	}
 
-	log.Info("create session for ip: %s", utils.GetIp(ctx))
 	session.CreateSession(ctx)
-
-	log.Info("session: %v", session)
 }
 
 func (pubSe) OnAfterInvoke(string, []reflect.Value, bool, []reflect.Value, interface{}) {}

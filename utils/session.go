@@ -66,7 +66,6 @@ func (ss *sessionStore) generateSessionId(ctx interface{}) string {
 // get session id from context
 func (ss *sessionStore) getSessionId(ctx interface{}) string {
 	sess, err := GetCookie(cookieSessId, ctx)
-	fmt.Printf("get session id %v from cookie, err is %v\n", sess, err)
 	if err != nil {
 		return ""
 	}
@@ -82,7 +81,6 @@ func (ss *sessionStore) isSessIdExist(sessId string) bool {
 
 // delete session from session store
 func (ss *sessionStore) delSession(sessionIds ...string) {
-	fmt.Println("delete session by ids: ", sessionIds)
 	ss.mu.Lock()
 	defer ss.mu.Unlock()
 	for _, sessionId := range sessionIds {
@@ -118,7 +116,6 @@ func (ss *sessionStore) SetSession(key string, val interface{}, ctx interface{})
 	sessId := ss.getSessionId(ctx)
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
-	fmt.Printf("set session for sessId %s: key %s, value %v\n", sessId, key, val)
 	ss.sess[sessId].set(key, val)
 }
 
@@ -127,7 +124,6 @@ func (ss *sessionStore) DeleteKey(key string, ctx interface{}) {
 	sessId := ss.getSessionId(ctx)
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
-	fmt.Printf("delete session key %s\n", key)
 	ss.sess[sessId].del(key)
 }
 
@@ -141,7 +137,6 @@ func (ss *sessionStore) GetSession(key string, ctx interface{}) interface{} {
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
 	sessId := ss.getSessionId(ctx)
-	fmt.Printf("get session by sessionId %s and key %s from session %v\n", sessId, key, ss.String())
 	if sess, ok := ss.sess[sessId]; ok {
 		return sess.get(key)
 	}
@@ -179,22 +174,18 @@ func newSession() *session {
 func (s *session) set(key string, val interface{}) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	fmt.Printf("set key %s with key length %d\n", key, len(key))
 	s.vals[key] = val
 	s.updated = time.Now().Unix()
-	fmt.Printf("currently this session is %v\n", s.vals)
 }
 
 func (s *session) get(key string) interface{} {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	fmt.Printf("get key %s with key length %d\n", key, len(key))
 	return s.vals[key]
 }
 
 func (s *session) del(key string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	fmt.Printf("del key %s\n", key)
 	delete(s.vals, key)
 }
