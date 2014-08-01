@@ -66,7 +66,7 @@ func (ss *sessionStore) generateSessionId(ctx interface{}) string {
 // get session id from context
 func (ss *sessionStore) getSessionId(ctx interface{}) string {
 	sess, err := GetCookie(cookieSessId, ctx)
-	fmt.Printf("get session id %v, err is %v\n", sess, err)
+	fmt.Printf("get session id %v from cookie, err is %v\n", sess, err)
 	if err != nil {
 		return ""
 	}
