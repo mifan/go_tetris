@@ -93,9 +93,13 @@ func (ss *sessionStore) delSession(sessionIds ...string) {
 // create a session or refresh it
 func (ss *sessionStore) CreateSession(ctx interface{}) {
 	sessId := ss.getSessionId(ctx)
-	if !ss.isSessIdExist(sessId) {
-		sessId = ss.generateSessionId(ctx)
+	if ss.isSessIdExist(sessId) {
+		ss.mu.RLock()
+		defer ss.mu.RUnlock()
+		ss.sess[sessId].updated = time.Now().Unix()
+		return
 	}
+	sessId = ss.generateSessionId(ctx)
 	if err := AddCookie(cookieSessId, sessId, ctx); err != nil {
 		fmt.Println("add cookie error: ", err)
 		return
