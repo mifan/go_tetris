@@ -25,6 +25,8 @@ func (pubSe) OnBeforeInvoke(fName string, params []reflect.Value, isSimple bool,
 
 	log.Info("create session for ip: %s", utils.GetIp(ctx))
 	session.CreateSession(ctx)
+
+	log.Info("session: %v", session)
 }
 
 func (pubSe) OnAfterInvoke(string, []reflect.Value, bool, []reflect.Value, interface{}) {}
