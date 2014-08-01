@@ -82,6 +82,7 @@ func (ss *sessionStore) isSessIdExist(sessId string) bool {
 
 // delete session from session store
 func (ss *sessionStore) delSession(sessionIds ...string) {
+	fmt.Println("delete session by ids: ", sessionIds...)
 	ss.mu.Lock()
 	defer ss.mu.Unlock()
 	for _, sessionId := range sessionIds {
@@ -136,6 +137,7 @@ func (ss *sessionStore) GetSession(key string, ctx interface{}) interface{} {
 	ss.mu.RLock()
 	defer ss.mu.RUnlock()
 	sessId := ss.getSessionId(ctx)
+	fmt.Printf("get session by sessionId %s and key %s from session %v\n", sessId, key, ss.String())
 	if sess, ok := ss.sess[sessId]; ok {
 		return sess.get(key)
 	}
