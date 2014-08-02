@@ -27,7 +27,6 @@ const (
 )
 
 var (
-
 	// regular expressions
 	emailReg = regexp.MustCompile(`^[\w.]+\@[\w-]+\.[\w.]+$`)
 	passReg  = regexp.MustCompile(`^[\w]{6,22}$`)
