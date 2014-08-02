@@ -113,6 +113,17 @@ func (us *Users) del(uid ...int) {
 	}
 }
 
+// get all users
+func (us *Users) GetAllUsers() []*User {
+	us.mu.RLock()
+	defer us.mu.RUnlock()
+	users := make([]*User, 0)
+	for _, u := range us.users {
+		users = append(users, u)
+	}
+	return users
+}
+
 // get a user
 func (us *Users) GetById(uid int) *User {
 	us.mu.RLock()
@@ -239,6 +250,16 @@ func (us *Users) Update(uid int, upts ...UpdateInterface) error {
 		return fmt.Errorf(errUserNotExist, uid)
 	}
 	return u.Update(upts...)
+}
+
+// give energy to all users
+func (us *Users) EnergyGiveout() {
+	for uid, u := range us.users {
+		if u.GetEnergy() > 0 {
+			continue
+		}
+		us.Update(uid, NewUpdateInt(UF_Energy, 10))
+	}
 }
 
 // user fields which could be updated
