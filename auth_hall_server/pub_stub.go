@@ -171,6 +171,7 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 	session.DeleteKey(sessKeyRegister, ctx)
 	// add user in cache
 	u := types.NewUser(users.GetNextId(), email, password, nickname, addr)
+	u.Update(types.NewUpdateInt(types.UF_Energy, 10)) // new user get 10 energy
 	users.Add(u)
 	users.IncrNextId()
 	// async insert into database
