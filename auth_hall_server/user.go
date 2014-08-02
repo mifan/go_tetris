@@ -34,6 +34,7 @@ func energyGiveout() {
 			users.EnergyGiveout()
 			insertOrUpdateUser(users.GetAllUsers()...)
 		}
+		time.Sleep(time.Minute)
 	}
 }
 
