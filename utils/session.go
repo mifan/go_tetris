@@ -25,6 +25,18 @@ func NewSessionStore() *sessionStore {
 	return ss.start()
 }
 
+// session store initialization
+func (ss *sessionStore) Init(sess map[string]map[string]interface{}) {
+	ss.mu.Lock()
+	defer ss.mu.Unlock()
+	for sessId, ses := range sess {
+		ss.sess[sessId] = newSession()
+		for key, val := range ses {
+			ss.sess[sessId].set(key, val)
+		}
+	}
+}
+
 // session store start
 func (ss *sessionStore) start() *sessionStore {
 	go ss.delExpireSessions()
@@ -91,19 +103,22 @@ func (ss *sessionStore) delSession(sessionIds ...string) {
 // create a session or refresh it
 func (ss *sessionStore) CreateSession(ctx interface{}) {
 	sessId := ss.getSessionId(ctx)
-	if ss.isSessIdExist(sessId) {
-		ss.mu.RLock()
-		defer ss.mu.RUnlock()
-		ss.sess[sessId].updated = time.Now().Unix()
-		return
+	existId := ss.isSessIdExist(sessId)
+	if !existId {
+		sessId = ss.generateSessionId(ctx)
 	}
-	sessId = ss.generateSessionId(ctx)
 	if err := AddCookie(cookieSessId, sessId, ctx); err != nil {
 		fmt.Println("add cookie error: ", err)
 		return
 	}
 	if err := SetCookie(cookieSessId, sessId, ctx); err != nil {
 		fmt.Println("set cookie error: ", err)
+		return
+	}
+	if existId {
+		ss.mu.RLock()
+		defer ss.mu.RUnlock()
+		ss.sess[sessId].updated = time.Now().Unix()
 		return
 	}
 	ss.mu.Lock()
