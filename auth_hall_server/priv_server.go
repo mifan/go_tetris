@@ -22,6 +22,9 @@ type (
 
 func (privSe) OnBeforeInvoke(funcN string, params []reflect.Value, isSimple bool, ctx interface{}) {
 	log.Info(utils.HproseLog(funcN, params, ctx))
+	if !pubServerEnable && funcN == "Register" {
+		panic("the auth server is closing, do not accept any registration...")
+	}
 	if funcN != "Register" && !clients.IsServerExist(utils.GetIp(ctx)) {
 		panic("game server should first register, otherwise it is not allowed to invoke functions in auth server")
 	}
