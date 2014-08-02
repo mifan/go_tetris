@@ -20,7 +20,7 @@ const (
 	maxAvatar         = 1 << 18 // 256KB
 
 	// error const
-	errUserNotExist    = "用户 %v 已经被占用"
+	errUserNotExist    = "用户 %v 不存在"
 	errTableNotExist   = "桌子 %v 不存在, 请加入别的桌子"
 	errUnmatchedEmail  = "验证码发到邮箱 %s, 注册邮箱也必须是这个! 请不要这样攻击我们的服务!"
 	errExceedMaxAvatar = "头像大小不能超过256KB, 该头像大小为 %dKB."
