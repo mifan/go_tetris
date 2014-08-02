@@ -7,4 +7,5 @@ var session = utils.NewSessionStore()
 
 func initSession() {
 	session.Init(querySessions())
+	deleteSessions()
 }

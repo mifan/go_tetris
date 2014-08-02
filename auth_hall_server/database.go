@@ -269,3 +269,10 @@ func querySessions() map[string]map[string]interface{} {
 	}
 	return res
 }
+
+// delete sessions
+func deleteSessions() {
+	if _, err := db.Exec("DELETE FROM sessions"); err != nil {
+		log.Debug("can not delete all sessions in database: %v", err)
+	}
+}
