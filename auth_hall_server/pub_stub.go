@@ -27,8 +27,6 @@ const (
 )
 
 var (
-	// session store
-	session = utils.NewSessionStore()
 
 	// regular expressions
 	emailReg = regexp.MustCompile(`^[\w.]+\@[\w-]+\.[\w.]+$`)

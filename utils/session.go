@@ -126,6 +126,20 @@ func (ss *sessionStore) CreateSession(ctx interface{}) {
 	ss.sess[sessId] = newSession()
 }
 
+// get all session to store in db
+func (ss *sessionStore) GetAllSession() map[string]map[string]interface{} {
+	ss.mu.RLock()
+	defer ss.mu.RUnlock()
+	res := make(map[string]map[string]interface{})
+	for sessId, sess := range ss.sess {
+		res[sessId] = make(map[string]interface{})
+		for key, val := range sess.vals {
+			res[sessId][key] = val
+		}
+	}
+	return res
+}
+
 // store data in session
 func (ss *sessionStore) SetSession(key string, val interface{}, ctx interface{}) {
 	sessId := ss.getSessionId(ctx)

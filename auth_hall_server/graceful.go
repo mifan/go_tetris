@@ -36,6 +36,8 @@ func notify() {
 	for !progCanExit {
 		time.Sleep(time.Second)
 	}
+	// store the sessions
+	storeSession(session.GetAllSession())
 
 	log.Info("the auth server is gracefully exit...")
 	time.Sleep(1 * time.Second)

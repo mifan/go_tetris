@@ -6,6 +6,7 @@ func init() {
 	initLogger()
 	initClient()
 	initDatabase()
+	initSession()
 	initPubServer()
 	initPrivServer()
 	initUsers()

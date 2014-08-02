@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -22,6 +23,11 @@ const (
 		uid INT,
 		amount INT,
 		created INT
+	) ENGINE=innoDB;`
+	sqlCreateSession = `CREATE TABLE sessions (
+		sessionId VARCHAR(128),
+		session BLOB,
+		PRIMARY KEY (sessionId)
 	) ENGINE=innoDB;`
 )
 
@@ -51,6 +57,9 @@ func createTable() {
 	}
 	if _, err := db.Exec(sqlCreateEnergy); err != nil {
 		log.Debug("can not create energy table: %v", err)
+	}
+	if _, err := db.Exec(sqlCreateSession); err != nil {
+		log.Debug("can not create session table: %v", err)
 	}
 }
 
@@ -178,6 +187,39 @@ func insertOrUpdateUser(us ...*types.User) {
 	}
 }
 
+// store session into db before the program exit
+func storeSession(sesses map[string]map[string]interface{}) {
+	tx, err := db.Begin()
+	if err != nil {
+		log.Debug("can not start transaction for storing session: %v", err)
+		return
+	}
+	defer func() {
+		if err != nil {
+			log.Debug("can not store session, get error: %v", err)
+		} else {
+			log.Info("successfully store all sessions in the database")
+		}
+	}()
+	if err = func() error {
+		for sessId, sess := range sesses {
+			data, err := json.Marshal(sess)
+			if err != nil {
+				return err
+			}
+			if _, err := tx.Exec("INSERT INTO sessions VALUES(?, ?)", sessId, data); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		tx.Rollback()
+		return
+	}
+	err = tx.Commit()
+	return
+}
+
 // query all users
 func queryUsers() []*types.User {
 	sql := `SELECT * FROM users`
@@ -199,4 +241,31 @@ func queryUsers() []*types.User {
 		users = append(users, u)
 	}
 	return users
+}
+
+// query all sessions
+func querySessions() map[string]map[string]interface{} {
+	sql := `SELECT * FROM sessions`
+	rows, err := db.Query(sql)
+	if err != nil {
+		log.Debug("can not query sessions: %v", err)
+		return nil
+	}
+	defer rows.Close()
+	res := make(map[string]map[string]interface{})
+	for rows.Next() {
+		var sessId string
+		var sess []byte
+		if err := rows.Scan(&sessId, &sess); err != nil {
+			log.Debug("can not scan session: %v", err)
+			return nil
+		}
+		var data = make(map[string]interface{})
+		if err := json.Unmarshal(sess, &data); err != nil {
+			log.Debug("can not unmarshal session: %v", err)
+			return nil
+		}
+		res[sessId] = data
+	}
+	return res
 }
