@@ -44,7 +44,7 @@ func recv() {
 			for _, v := range res.Transactions {
 				switch v.Category {
 				case "receive":
-					u := users.GetByNickname(v.Account)
+					u := getUserByNickname(v.Account)
 					if u == nil {
 						continue
 					}

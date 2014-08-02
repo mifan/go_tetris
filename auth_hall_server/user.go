@@ -6,18 +6,12 @@ import (
 	"github.com/gogames/go_tetris/types"
 )
 
-var users = types.NewUsers()
+// user cache expire in 15 days
+var users = types.NewUsers(15)
 
 func initUsers() {
 	us := queryUsers()
 	users.Add(us...)
-	id := 0
-	for _, v := range us {
-		if v.Uid >= id {
-			id = v.Uid + 1
-		}
-	}
-	users.SetNextId(id)
 
 	log.Info("initialize users in the cache...")
 	go energyGiveout()
@@ -41,4 +35,43 @@ func energyGiveout() {
 func setNextGiveoutTime() {
 	tN := time.Now()
 	nextGiveoutTime = time.Date(tN.Year(), tN.Month(), tN.Day()+1, 0, 0, 0, 0, time.Local)
+}
+
+func getUserById(uid int) *types.User {
+	if u := users.GetById(uid); u != nil {
+		return u
+	}
+	if u := queryUser("Uid", uid); u != nil {
+		u.Update()
+		insertOrUpdateUser(u)
+		users.Add(u)
+		return u
+	}
+	return nil
+}
+
+func getUserByEmail(email string) *types.User {
+	if u := users.GetByEmail(email); u != nil {
+		return u
+	}
+	if u := queryUser("Email", email); u != nil {
+		u.Update()
+		insertOrUpdateUser(u)
+		users.Add(u)
+		return u
+	}
+	return nil
+}
+
+func getUserByNickname(nickname string) *types.User {
+	if u := users.GetByNickname(nickname); u != nil {
+		return u
+	}
+	if u := queryUser("Nickname", nickname); u != nil {
+		u.Update()
+		insertOrUpdateUser(u)
+		users.Add(u)
+		return u
+	}
+	return nil
 }

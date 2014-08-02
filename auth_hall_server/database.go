@@ -243,6 +243,20 @@ func queryUsers() []*types.User {
 	return users
 }
 
+// query user by "field" & "val"
+func queryUser(field string, val interface{}) *types.User {
+	sql := fmt.Sprintf(`SELECT * FROM users WHERE %s = ?`, field)
+	row := db.QueryRow(sql, val)
+	u := &types.User{}
+	if err := row.Scan(&u.Uid, &u.Avatar, &u.Email, &u.Password, &u.Nickname,
+		&u.Energy, &u.Level, &u.Win, &u.Lose, &u.Addr, &u.Balance, &u.Freezed,
+		&u.Updated); err != nil {
+		log.Error("can not scan user, error: %v", err)
+		return nil
+	}
+	return u
+}
+
 // query all sessions
 func querySessions() map[string]map[string]interface{} {
 	sql := `SELECT * FROM sessions`

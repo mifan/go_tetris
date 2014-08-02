@@ -27,21 +27,43 @@ type Users struct {
 	// generate next user Id
 	nextId int
 	nmu    sync.Mutex
+
+	// expire days
+	expire int
 }
 
-func NewUsers() *Users {
+func NewUsers(expireInDays int) *Users {
 	us := &Users{
 		users:     make(map[int]*User),
 		emails:    make(map[string]*User),
 		nicknames: make(map[string]*User),
 		busyUsers: make(map[int]int64),
+		expire:    expireInDays,
 	}
 	return us.init()
 }
 
 // init users cache
 func (us *Users) init() *Users {
+	go us.releaseExpire()
 	return us
+}
+
+func (us *Users) releaseExpire() {
+	for {
+		us.del(func() []int {
+			us.mu.RLock()
+			defer us.mu.RUnlock()
+			ids := make([]int, 0)
+			for uid, u := range us.users {
+				if (int(time.Now().Unix()) - u.Updated) > us.expire*3600*24 {
+					ids = append(ids, uid)
+				}
+			}
+			return ids
+		}()...)
+		time.Sleep(time.Hour)
+	}
 }
 
 // set next id
@@ -49,11 +71,6 @@ func (us *Users) SetNextId(val int) {
 	us.nmu.Lock()
 	defer us.nmu.Unlock()
 	us.nextId = val
-}
-
-// incr next id
-func (us *Users) IncrNextId() {
-	us.SetNextId(us.GetNextId() + 1)
 }
 
 // get next id
@@ -85,6 +102,10 @@ func (us *Users) Add(users ...*User) error {
 		us.users[u.Uid] = u
 		us.emails[u.Email] = u
 		us.nicknames[u.Nickname] = u
+		// set next id
+		if us.GetNextId() <= u.Uid {
+			us.SetNextId(u.Uid + 1)
+		}
 	}
 	return nil
 }
@@ -239,12 +260,10 @@ func (u2b update2dByte) Val() interface{} {
 }
 
 // update
+// if not update statement specified, then only update its Updated
 func (us *Users) Update(uid int, upts ...UpdateInterface) error {
 	us.mu.Lock()
 	defer us.mu.Unlock()
-	if len(upts) == 0 {
-		return nil
-	}
 	u, ok := us.users[uid]
 	if !ok {
 		return fmt.Errorf(errUserNotExist, uid)

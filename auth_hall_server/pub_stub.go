@@ -18,6 +18,7 @@ const (
 	minEnergy         = 1
 	ratioEnergy2mBTC  = 10
 	maxAvatar         = 1 << 18 // 256KB
+	defaultEnergy     = 10
 
 	// error const
 	errUserNotExist    = "用户 %v 不存在"
@@ -78,7 +79,7 @@ func (pubStub) SendMailRegister(to string, ctx interface{}) error {
 
 // send mail, forget password
 func (pubStub) SendMailForget(to string, ctx interface{}) error {
-	if u := users.GetByEmail(to); u == nil {
+	if u := getUserByEmail(to); u == nil {
 		return fmt.Errorf(errUserNotExist, to)
 	}
 	authenCode := utils.RandString(8)
@@ -112,7 +113,7 @@ func (pubStub) ForgetPassword(newPassword, authenCode string, ctx interface{}) e
 	if !ok {
 		return errForgetPassGetCodeFirst
 	}
-	u := users.GetByEmail(email)
+	u := getUserByEmail(email)
 	if u == nil {
 		return fmt.Errorf(errUserNotExist, email)
 	}
@@ -150,10 +151,10 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 	if !passReg.MatchString(password) {
 		return errIncorrectPasswordFormat
 	}
-	if users.GetByEmail(email) != nil {
+	if getUserByEmail(email) != nil {
 		return errEmailExist
 	}
-	if users.GetByNickname(nickname) != nil {
+	if getUserByNickname(nickname) != nil {
 		return errNicknameExist
 	}
 	// generate new bitcoin address for the user
@@ -170,9 +171,8 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 	session.DeleteKey(sessKeyRegister, ctx)
 	// add user in cache
 	u := types.NewUser(users.GetNextId(), email, password, nickname, addr)
-	u.Update(types.NewUpdateInt(types.UF_Energy, 10)) // new user get 10 energy
+	u.Update(types.NewUpdateInt(types.UF_Energy, defaultEnergy)) // new user get 10 energy
 	users.Add(u)
-	users.IncrNextId()
 	// async insert into database
 	pushFunc(func() { insertOrUpdateUser(u) })
 	return nil
@@ -180,7 +180,7 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 
 // login
 func (pubStub) Login(nickname, password string, ctx interface{}) (err error) {
-	u := users.GetByNickname(nickname)
+	u := getUserByNickname(nickname)
 	if u == nil {
 		return fmt.Errorf(errUserNotExist, nickname)
 	}
@@ -204,7 +204,7 @@ func (pubStub) Logout(ctx interface{}) {
 // update session timestamp
 func (pubStub) GetUserInfo(ctx interface{}) (*types.User, error) {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return nil, fmt.Errorf(errUserNotExist, uid)
 		}
@@ -217,7 +217,7 @@ func (pubStub) GetUserInfo(ctx interface{}) (*types.User, error) {
 // update user password
 func (pubStub) UpdateUserPassword(currPass, newPass string, ctx interface{}) error {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u.Password != utils.Encrypt(currPass) {
 			return errIncorrectPwd
 		}
@@ -239,7 +239,7 @@ func (pubStub) UpdateUserAvatar(avatar []byte, ctx interface{}) error {
 		return fmt.Errorf(errExceedMaxAvatar, l)
 	}
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if err := u.Update(types.NewUpdate2dByte(types.UF_Avatar, avatar)); err != nil {
 			return err
 		}
@@ -252,7 +252,7 @@ func (pubStub) UpdateUserAvatar(avatar []byte, ctx interface{}) error {
 // get halls
 func (pubStub) GetHalls(ctx interface{}) (map[string]interface{}, error) {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return nil, fmt.Errorf(errUserNotExist, uid)
 		}
@@ -267,7 +267,7 @@ func (pubStub) GetHalls(ctx interface{}) (map[string]interface{}, error) {
 // get normal table
 func (pubStub) GetNormalTable(tid int, ctx interface{}) (map[string]interface{}, error) {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return nil, fmt.Errorf(errUserNotExist, uid)
 		}
@@ -279,7 +279,7 @@ func (pubStub) GetNormalTable(tid int, ctx interface{}) (map[string]interface{},
 // get tournament table
 func (pubStub) GetTournamentTable(tid int, ctx interface{}) (map[string]interface{}, error) {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return nil, fmt.Errorf(errUserNotExist, uid)
 		}
@@ -295,7 +295,7 @@ func (pubStub) GetTournamentTable(tid int, ctx interface{}) (map[string]interfac
 // actually it is just get a token
 func (pubStub) Join(tid int, isOb bool, ctx interface{}) (string, error) {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return "", fmt.Errorf(errUserNotExist, uid)
 		}
@@ -334,7 +334,7 @@ func (pubStub) ObserveTournament(tid int, ctx interface{}) (string, error) {
 		return "", errNilTournamentHall
 	}
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return "", fmt.Errorf(errUserNotExist, uid)
 		}
@@ -357,7 +357,7 @@ func (pubStub) ObserveTournament(tid int, ctx interface{}) (string, error) {
 // automatically match a normal game for user
 func (pubStub) AutoMatch(ctx interface{}) (host string, token string, err error) {
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			err = fmt.Errorf(errUserNotExist, uid)
 			return
@@ -382,7 +382,7 @@ func (pubStub) AutoMatch(ctx interface{}) (host string, token string, err error)
 				return
 			}
 			if id := t.Get1pUid(); id != -1 {
-				if tGap := math.Abs(float64(users.GetById(id).Level - u.Level)); tGap < gap {
+				if tGap := math.Abs(float64(getUserById(id).Level - u.Level)); tGap < gap {
 					gap = tGap
 					table = t
 				}
@@ -405,7 +405,7 @@ func (pubStub) Create(title string, bet int, ctx interface{}) (int, error) {
 		return -1, errNegativeBet
 	}
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			return -1, fmt.Errorf(errUserNotExist, uid)
 		}
@@ -437,7 +437,7 @@ func (pubStub) Apply(ctx interface{}) (host, token string, err error) {
 		return
 	}
 	if uid, ok := session.GetSession(sessKeyUserId, ctx).(int); ok {
-		u := users.GetById(uid)
+		u := getUserById(uid)
 		if u == nil {
 			err = fmt.Errorf(errUserNotExist, uid)
 			return
@@ -472,7 +472,7 @@ func (pubStub) Withdraw(amount int, address string, ctx interface{}) (string, er
 		return "", errNotLoggedIn
 	}
 
-	u := users.GetById(uid)
+	u := getUserById(uid)
 	if u == nil {
 		return "", fmt.Errorf(errUserNotExist, uid)
 	}
@@ -506,7 +506,7 @@ func (pubStub) BuyEnergy(amountOfmBTC int, ctx interface{}) error {
 	}
 	session.SetSession(sessKeyUserId, uid, ctx)
 
-	u := users.GetById(uid)
+	u := getUserById(uid)
 	if u == nil {
 		return fmt.Errorf(errUserNotExist, uid)
 	}

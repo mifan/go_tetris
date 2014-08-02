@@ -26,7 +26,7 @@ func (privStub) Unregister(ctx interface{}) {
 
 // join a game
 func (privStub) Join(tid, uid int, isOb bool) error {
-	u := users.GetById(uid)
+	u := getUserById(uid)
 	if u == nil {
 		return fmt.Errorf(errUserNotExist, uid)
 	}
@@ -42,7 +42,7 @@ func (privStub) Join(tid, uid int, isOb bool) error {
 
 // observe a tournament
 func (privStub) ObTournament(tid, uid int) error {
-	u := users.GetById(uid)
+	u := getUserById(uid)
 	if u == nil {
 		return fmt.Errorf(errUserNotExist, uid)
 	}
@@ -58,7 +58,7 @@ func (privStub) SetNormalGameResult(tid, winner, loser int, ctx interface{}) {
 	t := normalHall.GetTableById(tid)
 	// update winner info
 	func() {
-		w := users.GetById(winner)
+		w := getUserById(winner)
 		upts := make([]types.UpdateInterface, 0)
 		upts = append(upts, types.NewUpdateInt(types.UF_Balance, w.Balance+w.Freezed*2))
 		upts = append(upts, types.NewUpdateInt(types.UF_Freezed, 0))
@@ -74,7 +74,7 @@ func (privStub) SetNormalGameResult(tid, winner, loser int, ctx interface{}) {
 
 	// update loser info
 	func() {
-		l := users.GetById(loser)
+		l := getUserById(loser)
 		upts := make([]types.UpdateInterface, 0)
 		upts = append(upts, types.NewUpdateInt(types.UF_Freezed, 0))
 		upts = append(upts, types.NewUpdateInt(types.UF_Lose, l.Lose+1))
@@ -96,7 +96,7 @@ func (privStub) SetNormalGameResult(tid, winner, loser int, ctx interface{}) {
 func (privStub) SetTournamentResult(tid, winner, loser int) (int, error) {
 	t := tournamentHall.GetTableById(tid)
 	// update winner info
-	w := users.GetById(winner)
+	w := getUserById(winner)
 	func() {
 		upts := make([]types.UpdateInterface, 0)
 		upts = append(upts, types.NewUpdateInt(types.UF_Win, w.Win+1))
@@ -111,7 +111,7 @@ func (privStub) SetTournamentResult(tid, winner, loser int) (int, error) {
 
 	// update loser info
 	func() {
-		l := users.GetById(loser)
+		l := getUserById(loser)
 		if err := l.Update(types.NewUpdateInt(types.UF_Lose, l.Lose+1)); err != nil {
 			log.Critical("tournament hall -> can not update loser %v: %v", l.Nickname, err)
 		}
@@ -137,7 +137,7 @@ func (privStub) SetTournamentResult(tid, winner, loser int) (int, error) {
 
 // apply for tournament
 func (privStub) Apply(uid int) (int, error) {
-	tid, err := tournamentHall.Apply(users.GetById(uid))
+	tid, err := tournamentHall.Apply(getUserById(uid))
 	if err != nil {
 		return -1, err
 	}
@@ -147,7 +147,7 @@ func (privStub) Apply(uid int) (int, error) {
 
 // allocate for tournament
 func (privStub) Allocate(uid int) (int, error) {
-	tid, err := tournamentHall.Allocate(users.GetById(uid))
+	tid, err := tournamentHall.Allocate(getUserById(uid))
 	if err != nil {
 		return -1, err
 	}
