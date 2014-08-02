@@ -18,7 +18,7 @@ func notify() {
 	select {
 	case <-sigs:
 	}
-	deactivateServer()
+	deactivateServer(true)
 	log.Info("gracefully exit the program...")
 	time.Sleep(time.Second)
 	os.Exit(1)

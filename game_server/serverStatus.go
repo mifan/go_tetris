@@ -27,7 +27,7 @@ func activateServer() {
 }
 
 // deactivate the server
-func deactivateServer() {
+func deactivateServer(positive bool) {
 	if !isServerActive() {
 		log.Info("the server is not active, so no need to deactivate it...")
 		return
@@ -68,6 +68,9 @@ func deactivateServer() {
 	// inform the auth server unregister it
 	if err := authServerStub.Unregister(); err != nil {
 		log.Warn("can not inform the auth server that it is already unregister: %v", err)
+	}
+	if positive {
+		return
 	}
 	log.Info("the server is deactivated...enter checking status in 5 minutes")
 	time.Sleep(5 * time.Minute)

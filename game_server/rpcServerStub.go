@@ -15,7 +15,7 @@ import (
 // do not accept any new connections
 // handle the current connections
 func (stub) Deactivate() {
-	go deactivateServer()
+	go deactivateServer(false)
 }
 
 // count down after a game start
