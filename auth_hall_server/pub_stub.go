@@ -122,6 +122,7 @@ func (pubStub) ForgetPassword(newPassword, authenCode string, ctx interface{}) e
 	}
 	// delete session
 	session.DeleteKey(sessKeyForgetPass, ctx)
+	session.DeleteKey(sessKeyEmail, ctx)
 	pushFunc(func() { insertOrUpdateUser(u) })
 	return nil
 }
@@ -169,6 +170,7 @@ func (pubStub) Register(email, password, nickname, authenCode string, ctx interf
 	}
 	// delete the authen code
 	session.DeleteKey(sessKeyRegister, ctx)
+	session.DeleteKey(sessKeyEmail, ctx)
 	// add user in cache
 	u := types.NewUser(users.GetNextId(), email, password, nickname, addr)
 	u.Update(types.NewUpdateInt(types.UF_Energy, defaultEnergy)) // new user get 10 energy
