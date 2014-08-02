@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+# bitcoin - this script starts and stops the bitcoin daemon
+#
+# chkconfig: - 89 15
+# description: bitcoin
+# processname: bitcoin
+# pidfile:     /var/run/bitcoin.pid
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration
+. /etc/sysconfig/network
+
+# Check that networking is up
+[ "$NETWORKING" = "no" ] && exit 0
+
+bitcoin="/usr/local/bin/bitcoind"
+prog=$(basename $bitcoin)
+conf="/etc/gameServer/bitcoin.conf"
+
+lockfile=/var/lock/subsys/bitcoin
+
+start() {
+	[ -x $bitcoin ] || exit 5
+	echo -n $"Starting $prog: "
+	daemon $bitcoin -conf=$conf
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && touch $lockfile
+	return $retval
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	killall $prog
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && rm -f $lockfile
+	return $retval
+}
+
+rh_status() {
+	status $prog
+}
+
+rh_status_q() {
+	rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+	start)
+		rh_status_q && exit 0
+		$1
+		;;
+	stop)
+		rh_status_q || exit 0
+		$1
+		;;
+	status)
+		rh_status
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|status}"
+		exit 2
+esac
