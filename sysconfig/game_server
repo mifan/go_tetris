@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# game_server - this script starts and stops the game_server daemon
+#
+# chkconfig: - 90 16
+# description: game_server controls all game 
+# processname: game_server
+# pidfile:     /var/run/game_server.pid
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration
+. /etc/sysconfig/network
+
+# Check that networking is up
+[ "$NETWORKING" = "no" ] && exit 0
+
+game_server="/go/bin/game_server"
+prog=$(basename $game_server)
+conf=/etc/gameServer/game.conf
+logfile=/var/log/gameServer/game_runtime_log
+
+lockfile=/var/lock/subsys/game_server
+
+start() {
+	[ -x $game_server ] || exit 5
+	echo -n $"Starting $prog: "
+	touch $logfile
+	daemon $game_server --conf=$conf >& $logfile &
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && touch $lockfile
+	return $retval
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	killall $prog
+	retval=$?
+	echo
+	[ $retval -eq 0 ] && rm -f $lockfile
+	return $retval
+}
+
+rh_status() {
+	status $prog
+}
+
+rh_status_q() {
+	rh_status >/dev/null 2>&1
+}
+
+case "$1" in
+	start)
+		rh_status_q && exit 0
+		$1
+		;;
+	stop)
+		rh_status_q || exit 0
+		$1
+		;;
+	status)
+		rh_status
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|status|restart}"
+		exit 2
+esac
