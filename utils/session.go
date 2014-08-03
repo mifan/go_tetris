@@ -22,7 +22,7 @@ func NewSessionStore() *sessionStore {
 		sess:           make(map[string]*session),
 		expireInMinute: 120,
 	}
-	return ss.start()
+	return ss.init()
 }
 
 // session store initialization
@@ -38,13 +38,13 @@ func (ss *sessionStore) Init(sess map[string]map[string]interface{}) {
 }
 
 // session store start
-func (ss *sessionStore) start() *sessionStore {
-	go ss.delExpireSessions()
+func (ss *sessionStore) init() *sessionStore {
+	go ss.gc()
 	return ss
 }
 
 // delete expire sessions
-func (ss *sessionStore) delExpireSessions() {
+func (ss *sessionStore) gc() {
 	getExpire := func() []string {
 		ss.mu.RLock()
 		defer ss.mu.RUnlock()
