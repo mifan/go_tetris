@@ -9,9 +9,9 @@ import (
 
 // stub
 type gameServerStub struct {
-	Create              func(tid int, title string, bet int) error
-	Delete              func(tid int) error
 	Start               func(tid int) error
+	Delete              func(tid int) error
+	Create              func(tid int) error
 	SetNormalGameResult func(tid, winnerUid, bet int) error
 	SetTournamentResult func(tid, winnerUid int) error
 	SysText             func(text string) error

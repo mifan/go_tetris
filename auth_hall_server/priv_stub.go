@@ -26,16 +26,37 @@ func (privStub) Unregister(ctx interface{}) {
 
 // join a game
 func (privStub) Join(tid, uid int, isOb bool) error {
+	t := normalHall.GetTableById(tid)
 	u := getUserById(uid)
+	bet := t.GetBet()
+	if t == nil {
+		return fmt.Errorf(errTableNotExist, tid)
+	}
 	if u == nil {
 		return fmt.Errorf(errUserNotExist, uid)
 	}
+	// check busy
+	if users.IsBusyUser(uid) {
+		return errAlreadyInGame
+	}
+	// check energy
 	if u.GetEnergy() <= 0 {
 		return errInsufficientEnergy
+	}
+	// check balance
+	if u.GetBalance() < bet {
+		return errBalNotSufficient
 	}
 	if err := normalHall.JoinTable(tid, u, isOb); err != nil {
 		return err
 	}
+	// update energy, balance, freezed
+	if err := u.Update(types.NewUpdateInt(types.UF_Energy, u.GetEnergy()-1),
+		types.NewUpdateInt(types.UF_Balance, u.GetBalance()-bet),
+		types.NewUpdateInt(types.UF_Freezed, u.GetFreezed()+bet)); err != nil {
+		return err
+	}
+	pushFunc(func() { insertOrUpdateUser(u) })
 	users.SetBusy(uid)
 	return nil
 }
@@ -60,14 +81,14 @@ func (privStub) SetNormalGameResult(tid, winner, loser int, ctx interface{}) {
 	func() {
 		w := getUserById(winner)
 		upts := make([]types.UpdateInterface, 0)
-		upts = append(upts, types.NewUpdateInt(types.UF_Balance, w.Balance+w.Freezed*2))
-		upts = append(upts, types.NewUpdateInt(types.UF_Freezed, 0))
+		upts = append(upts, types.NewUpdateInt(types.UF_Balance, w.GetBalance()+t.GetBet()*2))
+		upts = append(upts, types.NewUpdateInt(types.UF_Freezed, w.GetFreezed()-t.GetBet()))
 		upts = append(upts, types.NewUpdateInt(types.UF_Win, w.Win+1))
 		if w.Win > (w.Level * w.Level) {
 			upts = append(upts, types.NewUpdateInt(types.UF_Level, w.Level+1))
 		}
 		if err := w.Update(upts...); err != nil {
-			log.Critical("normal hall -> can not update winner %v: %v", w.Nickname, err)
+			log.Critical("set normal hall result, can not update winner %v: %v", w.Nickname, err)
 		}
 		pushFunc(func() { insertOrUpdateUser(w) })
 	}()
@@ -76,10 +97,10 @@ func (privStub) SetNormalGameResult(tid, winner, loser int, ctx interface{}) {
 	func() {
 		l := getUserById(loser)
 		upts := make([]types.UpdateInterface, 0)
-		upts = append(upts, types.NewUpdateInt(types.UF_Freezed, 0))
+		upts = append(upts, types.NewUpdateInt(types.UF_Freezed, l.GetFreezed()-t.GetBet()))
 		upts = append(upts, types.NewUpdateInt(types.UF_Lose, l.Lose+1))
 		if err := l.Update(upts...); err != nil {
-			log.Critical("normal hall -> can not update loser %v: %v", l.Nickname, err)
+			log.Critical("set normal hall game result, can not update loser %v: %v", l.Nickname, err)
 		}
 		pushFunc(func() { insertOrUpdateUser(l) })
 	}()
@@ -135,6 +156,7 @@ func (privStub) SetTournamentResult(tid, winner, loser int) (int, error) {
 	return nid, nil
 }
 
+// TODO:
 // apply for tournament
 func (privStub) Apply(uid int) (int, error) {
 	tid, err := tournamentHall.Apply(getUserById(uid))
@@ -168,11 +190,17 @@ func (privStub) Quit(tid, uid int, isTournament bool) {
 var errTournamentDefaultReady = fmt.Errorf("tournament default is ready and can not set to not ready, what is wrong?")
 
 // switch ready state
-func (privStub) SwitchReady(tid, uid int) error {
+func (privStub) SwitchReady(tid, uid int, ctx interface{}) error {
 	if isTournament(tid) {
 		return errTournamentDefaultReady
 	}
-	normalHall.GetTableById(tid).SwitchReady(uid)
+	t := normalHall.GetTableById(tid)
+	t.SwitchReady(uid)
+	if t.ShouldStart() {
+		if err := clients.GetStub(utils.GetIp(ctx)).Start(tid); err != nil {
+			log.Debug("can not inform game server to start the table %d", tid)
+		}
+	}
 	return nil
 }
 

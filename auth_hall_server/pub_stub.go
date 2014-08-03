@@ -423,7 +423,7 @@ func (pubStub) Create(title string, bet int, ctx interface{}) (int, error) {
 		id := normalHall.NextTableId()
 		ip := clients.BestServer()
 		host := ip + ":" + gameServerSocketPort
-		if err := clients.GetStub(ip).Create(id, title, bet); err != nil {
+		if err := clients.GetStub(ip).Create(id); err != nil {
 			return -1, err
 		}
 		return id, normalHall.NewTable(id, title, host, bet)

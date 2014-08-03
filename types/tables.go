@@ -335,6 +335,13 @@ func (t *Table) SwitchReady(uid int) {
 	}
 }
 
+// should the table start
+func (t *Table) ShouldStart() bool {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	return t.ready1p && t.ready2p
+}
+
 // check if the table should expire
 func (t *Table) Expire() bool {
 	t.mu.Lock()

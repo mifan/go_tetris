@@ -40,6 +40,26 @@ func (stub) Start(tid int) {
 	}()
 }
 
+// create new table
+func (stub) Create(tid int) error {
+	return tables.NewTable(tid, "", "", -1)
+}
+
+// delete a table
+func (stub) Delete(tid int) error {
+	log.Info("auth server informs game server to delete the table %d", tid)
+	t := tables.GetTableById(tid)
+	if t == nil {
+		err := fmt.Errorf("can not delete the table %d because the table is not exist.", tid)
+		log.Debug("%v", err)
+		return err
+	}
+	sendAll(descError, "桌子长时间不开始游戏, 或者由于其他原因, 桌子已经被取消.", t.GetAllConns()...)
+	closeConn(t.GetAllConns()...)
+	tables.DelTable(tid)
+	return nil
+}
+
 // auth server inform game server the game result
 func (stub) SetNormalGameResult(tid, winnerUid, bet int) {
 	construct := func(win bool, bet int) (str string) {
@@ -67,6 +87,7 @@ func (stub) SetNormalGameResult(tid, winnerUid, bet int) {
 		send(table.Get1pConn(), descGameLose, construct(false, bet))
 		sendAll(descGameResult, "2P 赢得本局游戏", table.GetObConns()...)
 	default:
+		log.Debug("the winner uid is neither 1p nor 2p, who is it: %v", winnerUid)
 	}
 	table.ResetTable()
 	refreshTable(tid, false)
