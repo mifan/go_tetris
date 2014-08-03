@@ -457,6 +457,7 @@ func (pubStub) Apply(ctx interface{}) (host, token string, err error) {
 }
 
 // withdraw
+// amount in mBTC
 func (pubStub) Withdraw(amount int, address string, ctx interface{}) (string, error) {
 	// check if amount >= minWithdraw
 	if amount < minWithdraw {
@@ -488,7 +489,7 @@ func (pubStub) Withdraw(amount int, address string, ctx interface{}) (string, er
 		return "", err
 	}
 	// update user in the cache
-	if err := u.Update(types.NewUpdateInt("Balance", u.Balance-amount)); err != nil {
+	if err := u.Update(types.NewUpdateInt(types.UF_Balance, u.GetBalance()-amount)); err != nil {
 		return "", err
 	}
 	pushFunc(func() { insertWithdraw(txid, u.Nickname, address, amount) })

@@ -81,15 +81,13 @@ func keepDatabaseAlive() {
 
 // bitcoin withdraw
 func insertWithdraw(txid, nickname, toAddr string, amount int) error {
-	var tx *sql.Tx
-	var err error
+	tx, err := db.Begin()
 	defer func() {
 		if err != nil {
 			log.Error("can not insert into withdraw: %v", err)
 			log.Error("txid -> %v\nnickname -> %v\ntoAddr -> %v\namount -> %vmBTC", txid, nickname, toAddr, amount)
 		}
 	}()
-	tx, err = db.Begin()
 	if err != nil {
 		return err
 	}
@@ -118,15 +116,13 @@ func insertDeposit(txid, nickname, fromAddr string, amount int) error {
 		return fmt.Errorf("the deposit %s is already exist", txid)
 	}
 	// then insert
-	var tx *sql.Tx
-	var err error
+	tx, err := db.Begin()
 	defer func() {
 		if err != nil {
 			log.Error("can not insert into deposit: %v", err)
 			log.Error("txid -> %v\nnickname -> %v\nfromAddr -> %v\namount -> %vmBTC", txid, nickname, fromAddr, amount)
 		}
 	}()
-	tx, err = db.Begin()
 	if err != nil {
 		return err
 	}
@@ -149,15 +145,13 @@ func insertDeposit(txid, nickname, fromAddr string, amount int) error {
 
 // buy energy
 func buyEnergy(uid, amount int) error {
-	var tx *sql.Tx
-	var err error
+	tx, err := db.Begin()
 	defer func() {
 		if err != nil {
 			log.Error("buy energy get error: %v", err)
 			log.Error("uid -> %v\namount of mBTC -> %v\n", uid, amount)
 		}
 	}()
-	tx, err = db.Begin()
 	if err != nil {
 		return err
 	}
