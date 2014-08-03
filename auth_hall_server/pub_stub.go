@@ -380,14 +380,27 @@ func (pubStub) AutoMatch(ctx interface{}) (host string, token string, err error)
 				continue
 			}
 			if u.GetBalance() < t.GetBet() {
-				err = errBalNotSufficient
-				return
+				continue
 			}
 			if id := t.Get1pUid(); id != -1 {
 				if tGap := math.Abs(float64(getUserById(id).Level - u.Level)); tGap < gap {
 					gap = tGap
 					table = t
+					if tGap == 0 {
+						break
+					}
 				}
+				continue
+			}
+			if id := t.Get2pUid(); id != -1 {
+				if tGap := math.Abs(float64(getUserById(id).Level - u.Level)); tGap < gap {
+					gap = tGap
+					table = t
+					if tGap == 0 {
+						break
+					}
+				}
+				continue
 			}
 		}
 		if table == nil {
