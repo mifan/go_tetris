@@ -6,8 +6,8 @@ import (
 	"github.com/gogames/go_tetris/types"
 )
 
-// user cache expire in 15 days
-var users = types.NewUsers(15)
+// user cache never expire
+var users = types.NewUsers()
 
 func initUsers() {
 	us := queryUsers()
@@ -38,40 +38,43 @@ func setNextGiveoutTime() {
 }
 
 func getUserById(uid int) *types.User {
-	if u := users.GetById(uid); u != nil {
-		return u
-	}
-	if u := queryUser("Uid", uid); u != nil {
-		u.Update()
-		insertOrUpdateUser(u)
-		users.Add(u)
-		return u
-	}
-	return nil
+	return users.GetById(uid)
+	// if u := users.GetById(uid); u != nil {
+	// 	return u
+	// }
+	// if u := queryUser("Uid", uid); u != nil {
+	// 	u.Update()
+	// 	insertOrUpdateUser(u)
+	// 	users.Add(u)
+	// 	return u
+	// }
+	// return nil
 }
 
 func getUserByEmail(email string) *types.User {
-	if u := users.GetByEmail(email); u != nil {
-		return u
-	}
-	if u := queryUser("Email", email); u != nil {
-		u.Update()
-		insertOrUpdateUser(u)
-		users.Add(u)
-		return u
-	}
-	return nil
+	return users.GetByEmail(email)
+	// if u := users.GetByEmail(email); u != nil {
+	// 	return u
+	// }
+	// if u := queryUser("Email", email); u != nil {
+	// 	u.Update()
+	// 	insertOrUpdateUser(u)
+	// 	users.Add(u)
+	// 	return u
+	// }
+	// return nil
 }
 
 func getUserByNickname(nickname string) *types.User {
-	if u := users.GetByNickname(nickname); u != nil {
-		return u
-	}
-	if u := queryUser("Nickname", nickname); u != nil {
-		u.Update()
-		insertOrUpdateUser(u)
-		users.Add(u)
-		return u
-	}
-	return nil
+	return users.GetByNickname(nickname)
+	// if u := users.GetByNickname(nickname); u != nil {
+	// 	return u
+	// }
+	// if u := queryUser("Nickname", nickname); u != nil {
+	// 	u.Update()
+	// 	insertOrUpdateUser(u)
+	// 	users.Add(u)
+	// 	return u
+	// }
+	// return nil
 }

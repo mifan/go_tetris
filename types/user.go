@@ -32,20 +32,20 @@ type Users struct {
 	expire int
 }
 
-func NewUsers(expireInDays int) *Users {
+func NewUsers() *Users {
 	us := &Users{
 		users:     make(map[int]*User),
 		emails:    make(map[string]*User),
 		nicknames: make(map[string]*User),
 		busyUsers: make(map[int]int64),
-		expire:    expireInDays,
 	}
 	return us.init()
 }
 
 // init users cache
+// no expire
 func (us *Users) init() *Users {
-	go us.releaseExpire()
+	// go us.releaseExpire()
 	return us
 }
 
